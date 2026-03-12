@@ -39,7 +39,7 @@ How to use it:
 1. Download the `.exe` installer.
 2. Double-click it and complete the installation.
 3. Open OpenClaw and configure your LLM API key.
-4. Start using it.
+4. Go meet your lobster.
 
 ## Why Claw Up Feels Different
 
