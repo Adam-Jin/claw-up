@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/openclaw-logo-text.png" alt="OpenClaw" width="760">
+  <img src="./assets/clawup-logo-text.png" alt="OpenClaw" width="760">
 </p>
 
 <h1 align="center">Claw Up</h1>
