@@ -58,12 +58,6 @@ jobs:
         working-directory: clawup/frontend
         run: npm ci
 
-      - name: Build Windows executable
-        working-directory: clawup
-        run: |
-          wails doctor
-          wails build -clean -platform windows/amd64
-
       - name: Resolve release tag
         run: |
           if ("${{ github.event_name }}" -eq "workflow_dispatch") {
@@ -75,6 +69,46 @@ jobs:
             $tag = "${{ github.ref_name }}"
           }
           "RELEASE_TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_VERSION=$($tag.TrimStart('v'))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Inject Windows version metadata
+        working-directory: clawup
+        run: |
+          $version = $env:RELEASE_VERSION
+          if (-not $version) {
+            throw "RELEASE_VERSION is empty"
+          }
+          $fileVersion = "$version.0"
+          $infoTmp = Join-Path $env:RUNNER_TEMP "info.json"
+          $infoFilter = Join-Path $env:RUNNER_TEMP "info.jq"
+          $wailsTmp = Join-Path $env:RUNNER_TEMP "wails.json"
+          $wailsFilter = Join-Path $env:RUNNER_TEMP "wails.jq"
+
+          @'
+.fixed.file_version = $fileVersion
+| .info["0000"].ProductVersion = $version
+'@ | Set-Content $infoFilter
+
+          @'
+.info.productVersion = $version
+'@ | Set-Content $wailsFilter
+
+          jq --arg version "$version" --arg fileVersion "$fileVersion" -f $infoFilter build/windows/info.json | Set-Content $infoTmp
+          Move-Item $infoTmp build/windows/info.json -Force
+
+          jq --arg version "$version" -f $wailsFilter wails.json | Set-Content $wailsTmp
+          Move-Item $wailsTmp wails.json -Force
+
+          (Get-Content build/windows/installer/project.nsi) `
+            -replace '("DisplayVersion"\s+)"[^"]+"', "`$1`"$version`"" `
+            | Set-Content build/windows/installer/project.nsi
+
+      - name: Build Windows executable
+        working-directory: clawup
+        run: |
+          Write-Host "Building OpenClaw Installer version $env:RELEASE_VERSION"
+          wails doctor
+          wails build -clean -platform windows/amd64
 
       - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2
