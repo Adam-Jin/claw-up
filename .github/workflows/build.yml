@@ -84,14 +84,13 @@ jobs:
           $wailsTmp = Join-Path $env:RUNNER_TEMP "wails.json"
           $wailsFilter = Join-Path $env:RUNNER_TEMP "wails.jq"
 
-          @'
-.fixed.file_version = $fileVersion
-| .info["0000"].ProductVersion = $version
-'@ | Set-Content $infoFilter
+          $infoFilterContent = @(
+            '.fixed.file_version = $fileVersion'
+            '| .info["0000"].ProductVersion = $version'
+          ) -join "`n"
+          Set-Content -Path $infoFilter -Value $infoFilterContent
 
-          @'
-.info.productVersion = $version
-'@ | Set-Content $wailsFilter
+          Set-Content -Path $wailsFilter -Value '.info.productVersion = $version'
 
           jq --arg version "$version" --arg fileVersion "$fileVersion" -f $infoFilter build/windows/info.json | Set-Content $infoTmp
           Move-Item $infoTmp build/windows/info.json -Force
