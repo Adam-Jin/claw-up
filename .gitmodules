@@ -1,0 +1,4 @@
+[submodule "clawup"]
+	path = clawup
+	url = https://github.com/Adam-Jin/clawup.git
+	branch = main
