@@ -29,6 +29,18 @@
 
 > Download. Run. Launch. That is the whole point.
 
+## Get Started
+
+Download the latest Windows build from the
+[Releases page](https://github.com/Adam-Jin/claw-up/releases).
+
+How to use it:
+
+1. Download the `.exe` installer.
+2. Double-click it and complete the installation.
+3. Open OpenClaw and configure your LLM API key.
+4. Start using it.
+
 ## Why Claw Up Feels Different
 
 | Instant Onboarding | Smooth Setup Energy | Release-Ready Delivery |
